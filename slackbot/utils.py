@@ -42,6 +42,8 @@ def to_utf8(s):
             return s.encode('utf-8')
         elif isinstance(s, (list, tuple, set)):
             return [to_utf8(v) for v in s]
+        elif isinstance(s, dict):
+            return {k: to_utf8(v) for k, v in s.items()}
         else:
             return s
     else:

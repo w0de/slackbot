@@ -62,6 +62,14 @@ class PluginsManager(object):
                 # TODO Better exception handling
                 logger.exception('Failed to import %s', module)
 
+    def _parse_msg_args(self, msg):
+        kwargs = { k: v for k, v in msg.groupdict() }
+        args = []
+        for a in args:
+            if args.count(a) < msg.groups().count(a) - kwargs.values().count(a):
+                args.append(a)
+        return to_utf8(args), to_utf8(kwargs)
+
     def get_plugins(self, category, text):
         has_matching_plugin = False
         if text is None:
@@ -70,7 +78,8 @@ class PluginsManager(object):
             m = matcher.search(text)
             if m:
                 has_matching_plugin = True
-                yield self.commands[category][matcher], to_utf8(m.groups())
+                args, kwargs = self._parse_msg_args(m)
+                yield self.commands[category][matcher], args, kwargs
 
         if not has_matching_plugin:
             yield None, None
